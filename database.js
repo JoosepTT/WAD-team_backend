@@ -10,7 +10,7 @@ const pool = new Pool({
 
 const execute = async(query) => {
     try {
-        await pool.connect(); // gets connection
+        //await pool.connect(); // gets connection
         await pool.query(query); // sends queries
         return true;
     } catch (error) {
@@ -19,38 +19,39 @@ const execute = async(query) => {
     }
 };
 
+// users table
+const createUsersTableQuery = `
+    CREATE TABLE IF NOT EXISTS "users" (
+	    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	    email VARCHAR(200) NOT NULL UNIQUE,
+        password VARCHAR(200) NOT NULL,
+        username VARCHAR(200) NOT NULL
+    );`;
+
 // posts table
 const createPostTableQuery = `
     CREATE TABLE IF NOT EXISTS "posttable" (
 	    "id" SERIAL PRIMARY KEY,         
 	    "title" VARCHAR(200) NOT NULL,
-	    "body" VARCHAR(200) NOT NULL,
+	    "body" TEXT NOT NULL,
         "urllink" VARCHAR(200),
-        "uid" SERIAL,
-        "date" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        "user_id" uuid NOT NULL,
+        "date" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+
+        CONSTRAINT fk_user
+            FOREIGN KEY (user_id)
+            REFERENCES users(id)
+            ON DELETE CASCADE
     );`;
 
 // A function to execute the previous query   
-execute(createPostTableQuery).then(result => {
-    if (result) {
-        console.log('If does not exist, create the "posttable" table');
-    }
-});
+const initDb = async () => {
+    await execute(createUsersTableQuery);
+    console.log('Users table ready');
 
-// users table
-const createUsersTableQuery = `
-    CREATE TABLE IF NOT EXISTS "users" (
-	    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),         
-	    name VARCHAR(200) NOT NULL,
-	    email VARCHAR(200) NOT NULL UNIQUE,
-        password VARCHAR(200) NOT NULL
-    );`;
-
-// A function to execute the previous query   
-execute(createUsersTableQuery).then(result => {
-    if (result) {
-        console.log('If does not exist, create the "users" table');
-    }
-});
+    await execute(createPostTableQuery);
+    console.log('Posttable ready');
+};
+initDb();
 
 module.exports = pool;
