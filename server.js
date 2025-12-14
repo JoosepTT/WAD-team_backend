@@ -206,6 +206,18 @@ app.delete('/api/posts/:id', async(req, res) => {
     }
 });
 
+// deleting post by ID
+app.delete('/api/posts', async(req, res) => {
+    try {
+        console.log("delete all posts request has arrived");
+        await pool.query("DELETE FROM posttable")
+        res.json({ message: "Posts deleted successfully" });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 // adding new post
 app.post('/api/posts', async(req, res) => {
     try {

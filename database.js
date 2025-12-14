@@ -8,16 +8,7 @@ const pool = new Pool({
     port: "5432"
 });
 
-const execute = async(query) => {
-    try {
-        //await pool.connect(); // gets connection
-        await pool.query(query); // sends queries
-        return true;
-    } catch (error) {
-        console.error(error.stack);
-        return false;
-    }
-};
+const execute = (query) => pool.query(query)
 
 // users table
 const createUsersTableQuery = `
