@@ -125,7 +125,7 @@ app.post('/api/login', async(req, res) => {
 
         const token = generateJWT(user.rows[0].id);
         const data = {
-            user_id: user.rows[0].id,
+            id: user.rows[0].id,
             email: user.rows[0].email,
             username: user.rows[0].username
         }
