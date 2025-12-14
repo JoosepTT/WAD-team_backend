@@ -20,18 +20,36 @@ const execute = async(query) => {
 };
 
 // posts table
-const createTblQuery = `
+const createPostTableQuery = `
     CREATE TABLE IF NOT EXISTS "posttable" (
 	    "id" SERIAL PRIMARY KEY,         
 	    "title" VARCHAR(200) NOT NULL,
 	    "body" VARCHAR(200) NOT NULL,
-        "urllink" VARCHAR(200)  
+        "urllink" VARCHAR(200),
+        "uid" SERIAL,
+        "date" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
     );`;
 
 // A function to execute the previous query   
-execute(createTblQuery).then(result => {
+execute(createPostTableQuery).then(result => {
     if (result) {
-        console.log('If does not exists, create the "posttable" table');
+        console.log('If does not exist, create the "posttable" table');
+    }
+});
+
+// users table
+const createUsersTableQuery = `
+    CREATE TABLE IF NOT EXISTS "users" (
+	    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),         
+	    name VARCHAR(200) NOT NULL,
+	    email VARCHAR(200) NOT NULL UNIQUE,
+        password VARCHAR(200) NOT NULL
+    );`;
+
+// A function to execute the previous query   
+execute(createUsersTableQuery).then(result => {
+    if (result) {
+        console.log('If does not exist, create the "users" table');
     }
 });
 
