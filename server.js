@@ -178,7 +178,7 @@ app.put('/api/posts/:id', async(req, res) => {
         const { title, body, urllink, user_id } = req.body;
         console.log("update request has arrived");
         const updatepost = await pool.query(
-            "UPDATE posttable SET (title, body, urllink, user_id) = ($2, $3, $4, $5) WHERE id = $1 RETURNING *", [id, title, body, urllink, user_id]
+            "UPDATE posttable SET (title, body, urllink) = ($2, $3, $4) WHERE id = $1 RETURNING *", [id, title, body, urllink]
         );
         if (updatepost.rows.length === 0) {
             return res.status(404).json({ error: "Post not found" });
@@ -199,7 +199,7 @@ app.delete('/api/posts/:id', async(req, res) => {
         const deletepost = await pool.query(
             "DELETE FROM posttable WHERE id = $1", [id]
         );
-        if (deletepost.rows.length === 0) {
+        if (deletepost.rowCount === 0) {
             return res.status(404).json({ error: "Post not found" });
         }
         res.json({ message: "Post deleted successfully" });
