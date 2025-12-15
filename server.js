@@ -60,8 +60,11 @@ app.post('/api/logout', (req, res) => {
 // fetching all posts
 app.get('/api/posts', async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM posttable ORDER BY date DESC"
+    const result = await pool.query(`
+      SELECT p.id, p.title, p.body, p.urllink, p.date, u.username
+      FROM posttable p
+      JOIN users u ON p.user_id = u.id
+      ORDER BY p.date DESC`
     );
     
     const formattedPosts = result.rows.map(row => ({
@@ -172,10 +175,10 @@ app.get('/api/posts/:id', async(req, res) => {
 app.put('/api/posts/:id', async(req, res) => {
     try {
         const { id } = req.params;
-        const { title, body, urllink } = req.body;
+        const { title, body, urllink, user_id } = req.body;
         console.log("update request has arrived");
         const updatepost = await pool.query(
-            "UPDATE posttable SET (title, body, urllink) = ($2, $3, $4) WHERE id = $1 RETURNING *", [id, title, body, urllink]
+            "UPDATE posttable SET (title, body, urllink, user_id) = ($2, $3, $4, $5) WHERE id = $1 RETURNING *", [id, title, body, urllink, user_id]
         );
         if (updatepost.rows.length === 0) {
             return res.status(404).json({ error: "Post not found" });
